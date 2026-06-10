@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 
 import { useEffect, useRef, useState } from "react";
 
@@ -500,14 +501,14 @@ export function DualVideoSection() {
           </div>
           <div className="dvs-stat-row">
             {CONTENT.stats.map((s, i) => (
-              <>
-                {i > 0 && <div key={`div-${i}`} className="dvs-divider" />}
-                <div key={s.value} className="dvs-stat">
-                  <div className="dvs-stat-value">{s.value}</div>
-                  <div className="dvs-stat-label">{s.label}</div>
-                </div>
-              </>
-            ))}
+  <React.Fragment key={s.value}>
+    {i > 0 && <div className="dvs-divider" />}
+    <div className="dvs-stat">
+      <div className="dvs-stat-value">{s.value}</div>
+      <div className="dvs-stat-label">{s.label}</div>
+    </div>
+  </React.Fragment>
+))}
           </div>
         </div>
 
@@ -635,7 +636,7 @@ export function DualVideoSection() {
 }
 
 // ─── Play / Pause toggle ────────────────────────────────────────────────────
-function PlayPauseButton({ videoRef }: { videoRef: React.RefObject<HTMLVideoElement> }) {
+function PlayPauseButton({ videoRef }: { videoRef: React.RefObject<HTMLVideoElement | null>; }) {
   const [paused, setPaused] = useState(false);
 
   const toggle = (e: React.MouseEvent) => {
