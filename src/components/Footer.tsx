@@ -179,7 +179,7 @@ const Footer = () => {
       </div>
 
       {/* ── Watermark text ── */}
-      <div
+      {/* <div
         aria-hidden="true"
         style={{
           position: 'absolute',
@@ -197,7 +197,7 @@ const Footer = () => {
         }}
       >
         A-ROOF
-      </div>
+      </div> */}
 
       {/* ── Responsive styles ── */}
       <style>{`

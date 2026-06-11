@@ -6,6 +6,7 @@ import CTASection from "@/components/CTASection";
 import DualVideoSection from "@/components/DualVideoSection";
 import Footer from "@/components/Footer";
 import RoofScrollAd from "@/components/Roofscrollad";
+import RoofScrollAdBottom from "@/components/RoofScrollAdBottom";
 
 const NAV_ITEMS = [
   {
@@ -40,7 +41,7 @@ const NAV_ITEMS = [
       },
       {
         label: 'Tile UPVC Sheet',
-        href: 'tile-upvc-sheet',
+        href: '/products/tile-upvc',
         ariaLabel: 'View Tile UPVC Sheet',
         video: '/prodect/tile-roof.mp4',    // ← mp4 goes in video field
       },
@@ -83,9 +84,9 @@ export default function Home() {
         menuColor="#000000"
         scrollThreshold={80}
       />
-      <RoofScrollAd />
-      <AboutSection />
-      <ARoofScrollSection />
+    <RoofScrollAdBottom/>
+
+      
       <DualVideoSection />
       <BlogSection/>
       <CTASection/>

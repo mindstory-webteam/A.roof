@@ -9,7 +9,7 @@ interface CTASectionProps {
 }
 
 const CTASection = ({
-  backgroundImage = "/cta/roof-bg.jpg",
+  backgroundImage = "/nav-video/roof_rain_animation.gif",
   overlayOpacity = 0.62,
 }: CTASectionProps) => {
   const sectionRef = useRef<HTMLElement>(null);
@@ -110,12 +110,14 @@ const CTASection = ({
 
         /* ── Heading — white + blue italic ── */
         .cta-heading {
-          font-size: clamp(32px, 5vw, 58px);
+          font-size: 55px;
           font-weight: 900;
           letter-spacing: -0.03em;
           line-height: 1.06;
           color: #ffffff;
           margin: 0 0 36px;
+          display: flex;
+          
         }
         .cta-heading-blue {
           display: block;
@@ -223,8 +225,8 @@ const CTASection = ({
           <p className="cta-eyebrow">Built for the long run</p>
 
           <h2 className="cta-heading">
-            Ready to roof smarter?
-            <span className="cta-heading-blue">Get an expert quote today.</span>
+            Ready to roof  smarter?
+            {/* <span className="cta-heading-blue">Get an expert quote today.</span> */}
           </h2>
 
           <div className="cta-btns">
