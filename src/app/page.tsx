@@ -1,7 +1,10 @@
 import AboutSection from "@/components/AboutSection";
 import ARoofScrollSection from "@/components/ARoofScrollSection";
+import BlogSection from "@/components/BlogSection";
 import CardNav from "@/components/Cardnav";
+import CTASection from "@/components/CTASection";
 import DualVideoSection from "@/components/DualVideoSection";
+import Footer from "@/components/Footer";
 import RoofScrollAd from "@/components/Roofscrollad";
 
 const NAV_ITEMS = [
@@ -84,6 +87,9 @@ export default function Home() {
       <AboutSection />
       <ARoofScrollSection />
       <DualVideoSection />
+      <BlogSection/>
+      <CTASection/>
+      <Footer/>
     </div>
   );
 }
