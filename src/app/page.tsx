@@ -1,9 +1,7 @@
 import AboutSection from "@/components/AboutSection";
 import ARoofScrollSection from "@/components/ARoofScrollSection";
-
 import CardNav from "@/components/Cardnav";
 import DualVideoSection from "@/components/DualVideoSection";
-
 import RoofScrollAd from "@/components/Roofscrollad";
 
 const NAV_ITEMS = [
@@ -35,13 +33,13 @@ const NAV_ITEMS = [
         label: 'Traffer UPVC Sheet',
         href: '/products/traffer-upvc',
         ariaLabel: 'View Traffer UPVC Sheet',
-        gif: '/nav-video/roof_rain_animation.gif',
+        video: '/prodect/steel-roof.mp4',   // ← mp4 goes in video field
       },
       {
         label: 'Tile UPVC Sheet',
         href: '/products/tile-upvc',
         ariaLabel: 'View Tile UPVC Sheet',
-        gif: 'https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif',
+        video: '/prodect/tile-roof.mp4',    // ← mp4 goes in video field
       },
       {
         label: 'Specification',
@@ -80,15 +78,12 @@ export default function Home() {
         items={NAV_ITEMS}
         baseColor="#ffffff"
         menuColor="#000000"
-        buttonBgColor="#1a1a2e"
-        buttonTextColor="#ffffff"
+        scrollThreshold={80}
       />
       <RoofScrollAd />
-      <AboutSection/>
-     
-      <ARoofScrollSection/>
-      <DualVideoSection/>
-     
+      <AboutSection />
+      <ARoofScrollSection />
+      <DualVideoSection />
     </div>
   );
 }

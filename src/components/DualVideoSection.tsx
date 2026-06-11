@@ -4,8 +4,8 @@ import React from "react";
 import { useEffect, useRef, useState } from "react";
 
 // ─── Replace these with your actual video URLs ─────────────────────────────
-const LEFT_VIDEO_SRC = "/videos/Modern_farmhouse_with_luxury_cars_202606101017.mp4";
-const RIGHT_VIDEO_SRC = "/videos/Steel_roofing_sheets_commercial_202606101029.mp4";
+const LEFT_VIDEO_SRC =  "/prodect/Tile-roof.mp4";
+const RIGHT_VIDEO_SRC = "/prodect/steel-roof.mp4";
 
 // ─── A-Roof product content ──────────────────────────────────────────────────
 const CONTENT = {
