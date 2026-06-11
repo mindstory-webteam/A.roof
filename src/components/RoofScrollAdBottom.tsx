@@ -2,11 +2,10 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 
-const TOTAL_FRAMES = 240;
+const TOTAL_FRAMES = 82;
 const FRAME_PATH = (n: number) =>
-  `/frames/frames_all/frame_${String(n).padStart(4, "0")}.jpg`;
+  `/frames/roof-1/${String(n).padStart(3, "0")}.png`;
 
-// ─── Scroll-triggered content slides ─────────────────────────────────────────
 const SLIDES = [
   {
     from: 0.05,
@@ -60,18 +59,42 @@ export default function RoofScrollAdBottom() {
   const [activeSlide, setActiveSlide]   = useState<number | null>(null);
   const [slideVisible, setSlideVisible] = useState(false);
 
-  // ── Draw frame ────────────────────────────────────────────────────────────
-  const drawFrame = useCallback((idx: number) => {
+  // ── Draw frame with interpolation ────────────────────────────────────────
+  const drawFrame = useCallback((exactIndex: number) => {
     const canvas = canvasRef.current;
-    const img    = imagesRef.current[idx];
-    if (!canvas || !img || !loadedRef.current[idx]) return;
+    if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+
+    const lower = Math.floor(exactIndex);
+    const upper = Math.min(TOTAL_FRAMES - 1, lower + 1);
+    const blend = exactIndex - lower; // 0.0 → 1.0
+
+    const imgA = imagesRef.current[lower];
+    const imgB = imagesRef.current[upper];
+
     const cw = canvas.width, ch = canvas.height;
-    const iw = img.naturalWidth  || 1280;
-    const ih = img.naturalHeight || 720;
-    const scale = Math.max(cw / iw, ch / ih);
-    ctx.drawImage(img, (cw - iw * scale) / 2, (ch - ih * scale) / 2, iw * scale, ih * scale);
+
+    const drawImg = (img: HTMLImageElement, alpha: number) => {
+      if (!img) return;
+      const iw = img.naturalWidth  || 1280;
+      const ih = img.naturalHeight || 720;
+      const scale = Math.max(cw / iw, ch / ih);
+      ctx.globalAlpha = alpha;
+      ctx.drawImage(img, (cw - iw * scale) / 2, (ch - ih * scale) / 2, iw * scale, ih * scale);
+    };
+
+    ctx.clearRect(0, 0, cw, ch);
+
+    if (loadedRef.current[lower]) {
+      drawImg(imgA, 1);
+    }
+    // Blend next frame on top if loaded and there's a fractional part
+    if (blend > 0 && loadedRef.current[upper]) {
+      drawImg(imgB, blend);
+    }
+
+    ctx.globalAlpha = 1;
   }, []);
 
   // ── Preload frames ────────────────────────────────────────────────────────
@@ -127,7 +150,7 @@ export default function RoofScrollAdBottom() {
     return () => window.removeEventListener("resize", resize);
   }, [drawFrame]);
 
-  // ── Scroll handler ────────────────────────────────────────────────────────
+  // ── Scroll handler — passes exact float index for interpolation ───────────
   const handleScroll = useCallback(() => {
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
     rafRef.current = requestAnimationFrame(() => {
@@ -136,13 +159,16 @@ export default function RoofScrollAdBottom() {
       const maxScroll = container.offsetHeight - window.innerHeight;
       const scrolled  = Math.max(0, window.scrollY - container.offsetTop);
       const p         = Math.max(0, Math.min(1, scrolled / maxScroll));
-      const fi        = Math.min(TOTAL_FRAMES - 1, Math.max(0, Math.round(p * (TOTAL_FRAMES - 1))));
-      currentFrameRef.current = fi;
-      drawFrame(fi);
+
+      // Use exact float (not rounded) so drawFrame can interpolate
+      const exactIndex = Math.min(TOTAL_FRAMES - 1, Math.max(0, p * (TOTAL_FRAMES - 1)));
+      currentFrameRef.current = exactIndex;
+      drawFrame(exactIndex);
       setProgress(p);
+
       const idx = SLIDES.findIndex(s => p >= s.from && p <= s.to);
       if (idx !== -1) { setActiveSlide(idx); setSlideVisible(true); }
-      else { setSlideVisible(false); }
+      else            { setSlideVisible(false); }
     });
   }, [drawFrame]);
 
@@ -173,7 +199,6 @@ export default function RoofScrollAdBottom() {
         @keyframes roof-b-spin    { to { transform: rotate(360deg); } }
         @keyframes roof-b-fadeOut { to { opacity: 0; } }
 
-        /* ── Slide up from bottom ── */
         @keyframes roof-b-slideUp {
           from { opacity: 0; transform: translateY(60px); }
           to   { opacity: 1; transform: translateY(0); }
@@ -183,29 +208,20 @@ export default function RoofScrollAdBottom() {
           to   { opacity: 1; transform: translateY(0); }
         }
 
-        /* ──────────────────────────────────────────────────
-           BOTTOM PANEL
-           Positioned at the bottom of the sticky viewport.
-           The blur overlay fades out toward the TOP.
-        ────────────────────────────────────────────────── */
         .roof-b-panel {
           position: absolute;
           bottom: 0;
           left: 0;
           right: 0;
-          height: 55%;          /* how tall the panel is */
+          height: 55%;
           max-height: 480px;
           display: flex;
-          align-items: flex-end;  /* content sits at the bottom */
+          align-items: flex-end;
           pointer-events: none;
           z-index: 10;
           overflow: hidden;
         }
 
-        /*
-         * Dark + blurred overlay fading from bottom (opaque) to top (transparent).
-         * backdrop-filter blurs the canvas frames behind it.
-         */
         .roof-b-panel::before {
           content: '';
           position: absolute;
@@ -218,12 +234,10 @@ export default function RoofScrollAdBottom() {
           );
           backdrop-filter: blur(18px);
           -webkit-backdrop-filter: blur(18px);
-          /* Mask: blur is strong at the bottom, zero at the top */
           -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 45%);
           mask-image: linear-gradient(to bottom, transparent 0%, black 45%);
         }
 
-        /* ── Inner content ── */
         .roof-b-inner {
           position: relative;
           z-index: 1;
@@ -237,11 +251,9 @@ export default function RoofScrollAdBottom() {
           gap: 48px;
         }
 
-        /* ── Slide animation ── */
         .roof-b-in  { animation: roof-b-slideUp 0.6s cubic-bezier(0.22,1,0.36,1) forwards; }
         .roof-b-out { opacity: 0; }
 
-        /* ── Decorative rule + eyebrow ── */
         .roof-b-rule {
           display: inline-flex;
           align-items: center;
@@ -264,7 +276,6 @@ export default function RoofScrollAdBottom() {
           color: #e8700a;
         }
 
-        /* ── Heading ── */
         .roof-b-heading {
           font-family: 'Mulish', sans-serif;
           font-size: clamp(28px, 3.2vw, 50px);
@@ -278,7 +289,6 @@ export default function RoofScrollAdBottom() {
           animation: roof-b-fadeUp 0.42s ease 0.14s both;
         }
 
-        /* ── Divider ── */
         .roof-b-divider {
           width: 48px; height: 3px;
           background: linear-gradient(to right, #e8700a, transparent);
@@ -287,7 +297,6 @@ export default function RoofScrollAdBottom() {
           animation: roof-b-fadeUp 0.38s ease 0.20s both;
         }
 
-        /* ── Body ── */
         .roof-b-body {
           font-family: 'Mulish', sans-serif;
           font-size: clamp(13px, 1.1vw, 15px);
@@ -298,7 +307,6 @@ export default function RoofScrollAdBottom() {
           animation: roof-b-fadeUp 0.42s ease 0.28s both;
         }
 
-        /* ── Stat block (right side of grid) ── */
         .roof-b-stat {
           display: flex;
           flex-direction: column;
@@ -330,7 +338,6 @@ export default function RoofScrollAdBottom() {
           line-height: 1.4;
         }
 
-        /* ── Progress dots ── */
         .roof-b-dots {
           position: absolute;
           bottom: 24px;
@@ -354,7 +361,6 @@ export default function RoofScrollAdBottom() {
           transition: width 0.1s linear;
         }
 
-        /* ── Mobile ── */
         @media (max-width: 640px) {
           .roof-b-panel { height: 65%; max-height: 100%; }
           .roof-b-inner {
@@ -386,7 +392,6 @@ export default function RoofScrollAdBottom() {
             background: "#002c5b",
           }}
         >
-          {/* ── Canvas ── */}
           <canvas
             ref={canvasRef}
             style={{
@@ -398,15 +403,12 @@ export default function RoofScrollAdBottom() {
             }}
           />
 
-          {/* ── Bottom panel ── */}
           {slide && (
             <div
               key={`slide-b-${activeSlide}`}
               className={`roof-b-panel ${slideVisible ? "roof-b-in" : "roof-b-out"}`}
             >
               <div className="roof-b-inner">
-
-                {/* Left: eyebrow + heading + divider + body */}
                 <div>
                   <div className="roof-b-rule">
                     <div className="roof-b-rule-line" />
@@ -416,18 +418,14 @@ export default function RoofScrollAdBottom() {
                   <div className="roof-b-divider" />
                   <p className="roof-b-body">{slide.body}</p>
                 </div>
-
-                {/* Right: large stat */}
                 <div className="roof-b-stat">
                   <span className="roof-b-stat-num">{slide.stat}</span>
                   <span className="roof-b-stat-label">{slide.statLabel}</span>
                 </div>
-
               </div>
             </div>
           )}
 
-          {/* ── Progress dots ── */}
           {allLoaded && (
             <div className="roof-b-dots">
               {SLIDES.map((_, i) => (
@@ -441,7 +439,6 @@ export default function RoofScrollAdBottom() {
             </div>
           )}
 
-          {/* ── Loading screen ── */}
           {!allLoaded && (
             <div
               style={{
@@ -486,7 +483,6 @@ export default function RoofScrollAdBottom() {
             </div>
           )}
 
-          {/* ── Scroll hint ── */}
           {allLoaded && progress < 0.03 && (
             <div
               style={{

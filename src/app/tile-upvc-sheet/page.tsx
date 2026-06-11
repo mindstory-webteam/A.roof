@@ -1,12 +1,13 @@
-import AboutSection from "@/components/AboutSection";
-import ARoofScrollSection from "@/components/ARoofScrollSection";
+import AboutProducts from "@/components/AboutProducts";
+
 import BlogSection from "@/components/BlogSection";
 import CardNav from "@/components/Cardnav";
 import CTASection from "@/components/CTASection";
 import DualVideoSection from "@/components/DualVideoSection";
 import Footer from "@/components/Footer";
-import RoofScrollAd from "@/components/Roofscrollad";
+
 import RoofScrollAdBottom from "@/components/RoofScrollAdBottom";
+import VideoHeroSection from "@/components/VideoHeroSection";
 
 const NAV_ITEMS = [
   {
@@ -85,7 +86,9 @@ export default function Home() {
         scrollThreshold={80}
       />
     <RoofScrollAdBottom/>
-
+    <AboutProducts/>
+    <VideoHeroSection/>
+    
       
       <DualVideoSection />
       <BlogSection/>
