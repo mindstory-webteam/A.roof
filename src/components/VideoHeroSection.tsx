@@ -374,7 +374,7 @@ export default function VideoHeroSection() {
             </div>
 
             {/* Center play/pause button */}
-            <button className="vh-play-btn" onClick={togglePlay}
+            {/* <button className="vh-play-btn" onClick={togglePlay}
               aria-label={playing ? "Pause" : "Play"}
               style={{ opacity: entered ? 1 : 0, transition: "opacity 0.5s" }}
             >
@@ -393,7 +393,7 @@ export default function VideoHeroSection() {
                   </svg>
                 )}
               </div>
-            </button>
+            </button> */}
 
             {/* Bottom-left: scroll-driven headline */}
             <div style={{
