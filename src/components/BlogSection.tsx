@@ -1,7 +1,114 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useMemo, useEffect, ReactNode, RefObject } from "react";
 import Link from "next/link";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+gsap.registerPlugin(ScrollTrigger);
+
+// ─────────────────────────────────────────────
+// ScrollReveal — word-by-word blur/opacity/rotation
+// reveal on scroll. Built with inline styles so it
+// works without Tailwind; pass a `className` to hook
+// into this file's existing CSS classes (e.g.
+// "blog-subtext", "blog-featured-excerpt").
+// ─────────────────────────────────────────────
+interface ScrollRevealProps {
+  children: ReactNode;
+  scrollContainerRef?: RefObject<HTMLElement>;
+  enableBlur?: boolean;
+  baseOpacity?: number;
+  baseRotation?: number;
+  blurStrength?: number;
+  className?: string;
+  containerStyle?: React.CSSProperties;
+  rotationEnd?: string;
+  wordAnimationEnd?: string;
+}
+
+const ScrollReveal: React.FC<ScrollRevealProps> = ({
+  children,
+  scrollContainerRef,
+  enableBlur = true,
+  baseOpacity = 0.1,
+  baseRotation = 3,
+  blurStrength = 4,
+  className = "",
+  containerStyle,
+  rotationEnd = "bottom bottom",
+  wordAnimationEnd = "bottom bottom",
+}) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const splitText = useMemo(() => {
+    const text = typeof children === "string" ? children : "";
+    return text.split(/(\s+)/).map((word, index) => {
+      if (word.match(/^\s+$/)) return word;
+      return (
+        <span style={{ display: "inline-block" }} className="sr-word" key={index}>
+          {word}
+        </span>
+      );
+    });
+  }, [children]);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const scroller =
+      scrollContainerRef && scrollContainerRef.current
+        ? scrollContainerRef.current
+        : window;
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        el,
+        { transformOrigin: "0% 50%", rotate: baseRotation },
+        {
+          ease: "none",
+          rotate: 0,
+          scrollTrigger: { trigger: el, scroller, start: "top bottom", end: rotationEnd, scrub: true },
+        }
+      );
+
+      const wordElements = el.querySelectorAll<HTMLElement>(".sr-word");
+
+      gsap.fromTo(
+        wordElements,
+        { opacity: baseOpacity, willChange: "opacity" },
+        {
+          ease: "none",
+          opacity: 1,
+          stagger: 0.05,
+          scrollTrigger: { trigger: el, scroller, start: "top bottom-=20%", end: wordAnimationEnd, scrub: true },
+        }
+      );
+
+      if (enableBlur) {
+        gsap.fromTo(
+          wordElements,
+          { filter: `blur(${blurStrength}px)` },
+          {
+            ease: "none",
+            filter: "blur(0px)",
+            stagger: 0.05,
+            scrollTrigger: { trigger: el, scroller, start: "top bottom-=20%", end: wordAnimationEnd, scrub: true },
+          }
+        );
+      }
+    }, el);
+
+    return () => ctx.revert();
+  }, [children, scrollContainerRef, enableBlur, baseRotation, baseOpacity, rotationEnd, wordAnimationEnd, blurStrength]);
+
+  return (
+    <div ref={containerRef} style={containerStyle}>
+      <p className={className} style={{ margin: 0 }}>
+        {splitText}
+      </p>
+    </div>
+  );
+};
 
 interface BlogPost {
   slug: string;
@@ -289,6 +396,20 @@ const BlogSection = () => {
                 Roofing insights,
                 <span className="blog-heading-blue">straight from the field.</span>
               </h2>
+
+              {/* Subtext — ScrollReveal text effect */}
+              <ScrollReveal
+                baseOpacity={0.08}
+                baseRotation={2}
+                blurStrength={4}
+                enableBlur={true}
+                rotationEnd="bottom center"
+                wordAnimationEnd="bottom center"
+                className="blog-subtext"
+                containerStyle={{ marginTop: 10 }}
+              >
+                In-depth guides, climate-specific advice and honest product comparisons — written by the people who engineer A-Roof sheets.
+              </ScrollReveal>
             </div>
             <Link href="/blog" className="blog-view-all">
               View all articles
@@ -319,7 +440,21 @@ const BlogSection = () => {
                     {featured.tag}
                   </span>
                   <h3 className="blog-featured-title">{featured.title}</h3>
-                  <p className="blog-featured-excerpt">{featured.excerpt}</p>
+
+                  {/* Excerpt — ScrollReveal text effect */}
+                  <ScrollReveal
+                    key={featured.slug}
+                    baseOpacity={0.08}
+                    baseRotation={2}
+                    blurStrength={4}
+                    enableBlur={true}
+                    rotationEnd="bottom center"
+                    wordAnimationEnd="bottom center"
+                    className="blog-featured-excerpt"
+                  >
+                    {featured.excerpt}
+                  </ScrollReveal>
+
                   <div className="blog-meta">
                     <span>{featured.date}</span>
                     <span className="blog-meta-dot">·</span>

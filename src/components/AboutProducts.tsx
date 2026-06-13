@@ -1,6 +1,110 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo, ReactNode, RefObject } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+gsap.registerPlugin(ScrollTrigger);
+
+// ─────────────────────────────────────────────
+// ScrollReveal component (same effect as ProductDetailsSection)
+// ─────────────────────────────────────────────
+interface ScrollRevealProps {
+  children: ReactNode;
+  scrollContainerRef?: RefObject<HTMLElement>;
+  enableBlur?: boolean;
+  baseOpacity?: number;
+  baseRotation?: number;
+  blurStrength?: number;
+  containerClassName?: string;
+  textClassName?: string;
+  rotationEnd?: string;
+  wordAnimationEnd?: string;
+  style?: React.CSSProperties;
+}
+
+const ScrollReveal: React.FC<ScrollRevealProps> = ({
+  children,
+  scrollContainerRef,
+  enableBlur = true,
+  baseOpacity = 0.1,
+  baseRotation = 3,
+  blurStrength = 4,
+  containerClassName = "",
+  textClassName = "",
+  rotationEnd = "bottom bottom",
+  wordAnimationEnd = "bottom bottom",
+  style,
+}) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const splitText = useMemo(() => {
+    const text = typeof children === "string" ? children : "";
+    return text.split(/(\s+)/).map((word, index) => {
+      if (word.match(/^\s+$/)) return word;
+      return (
+        <span className="inline-block word" key={index}>
+          {word}
+        </span>
+      );
+    });
+  }, [children]);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const scroller =
+      scrollContainerRef && scrollContainerRef.current
+        ? scrollContainerRef.current
+        : window;
+
+    gsap.fromTo(
+      el,
+      { transformOrigin: "0% 50%", rotate: baseRotation },
+      {
+        ease: "none",
+        rotate: 0,
+        scrollTrigger: { trigger: el, scroller, start: "top bottom", end: rotationEnd, scrub: true },
+      }
+    );
+
+    const wordElements = el.querySelectorAll<HTMLElement>(".word");
+    gsap.fromTo(
+      wordElements,
+      { opacity: baseOpacity, willChange: "opacity" },
+      {
+        ease: "none",
+        opacity: 1,
+        stagger: 0.05,
+        scrollTrigger: { trigger: el, scroller, start: "top bottom-=20%", end: wordAnimationEnd, scrub: true },
+      }
+    );
+
+    if (enableBlur) {
+      gsap.fromTo(
+        wordElements,
+        { filter: `blur(${blurStrength}px)` },
+        {
+          ease: "none",
+          filter: "blur(0px)",
+          stagger: 0.05,
+          scrollTrigger: { trigger: el, scroller, start: "top bottom-=20%", end: wordAnimationEnd, scrub: true },
+        }
+      );
+    }
+
+    return () => {
+      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+    };
+  }, [scrollContainerRef, enableBlur, baseRotation, baseOpacity, rotationEnd, wordAnimationEnd, blurStrength]);
+
+  return (
+    <div ref={containerRef} className={`my-5 ${containerClassName}`}>
+      <p style={style} className={`leading-[1.5] font-semibold ${textClassName}`}>
+        {splitText}
+      </p>
+    </div>
+  );
+};
 
 const SECTIONS = [
   {
@@ -352,20 +456,20 @@ function Section({
         }}
       />
 
-      {/* body */}
-      <p
-        style={{
-          fontFamily: "'Mulish', sans-serif",
-          fontSize: "clamp(13px, 1vw, 15px)",
-          fontWeight: 400,
-          lineHeight: 1.9,
-          color: "#4a5568",
-          margin: "0 0 30px",
-          maxWidth: "430px",
-        }}
+      {/* body — ScrollReveal text effect */}
+      <ScrollReveal
+        baseOpacity={0.08}
+        baseRotation={3}
+        blurStrength={5}
+        enableBlur={true}
+        rotationEnd="bottom center"
+        wordAnimationEnd="bottom center"
+        containerClassName="!mt-0 !mb-[30px]"
+        textClassName="!leading-[1.9] !font-normal text-[#4a5568] max-w-[430px]"
+        style={{ fontFamily: "'Mulish', sans-serif", fontSize: "clamp(13px, 1vw, 15px)" }}
       >
         {section.body}
-      </p>
+      </ScrollReveal>
 
       {/* stat card */}
       <div
@@ -575,26 +679,23 @@ export default function AboutProducts() {
             </h1>
           </div>
 
-          {/* subtitle */}
-          <p
-            className="ap-sub"
-            style={{
-              fontFamily: "'Mulish', sans-serif",
-              fontSize: "clamp(14px, 1.2vw, 17px)",
-              fontWeight: 400,
-              color: "#4a5568",
-              maxWidth: "520px",
-              margin: "0 0 32px",
-              lineHeight: 1.8,
-            }}
+          {/* subtitle — ScrollReveal text effect */}
+          <ScrollReveal
+            baseOpacity={0.08}
+            baseRotation={2}
+            blurStrength={4}
+            enableBlur={true}
+            rotationEnd="bottom center"
+            wordAnimationEnd="bottom center"
+            containerClassName="ap-sub !mt-0 !mb-8"
+            textClassName="!leading-[1.8] !font-normal text-[#4a5568] max-w-[520px]"
+            style={{ fontFamily: "'Mulish', sans-serif", fontSize: "clamp(14px, 1.2vw, 17px)" }}
           >
-            A-Roof's 3-layer co-extruded UPVC sheets are engineered with ASA
-            anti-climate resin — retaining colour and strength against UV,
-            heat, dampness, and impact for decades.
-          </p>
+            A-Roof's 3-layer co-extruded UPVC sheets are engineered with ASA anti-climate resin — retaining colour and strength against UV, heat, dampness, and impact for decades.
+          </ScrollReveal>
 
           {/* weather pills */}
-         
+
         </div>
 
         {/* ── Sections ── */}
