@@ -173,7 +173,7 @@ const ProductDetailsSection: React.FC = () => {
               style={{ background: 'linear-gradient(135deg, #001e3c 0%, #003b7a 100%)' }}
             />
             <img
-              src="/prodect/aroof-sheet-installation.png"
+              src="/images/magnific_ultrarealistic-closeup-ar_jSh8pogLD0.png"
               alt="A-Roof ASA coated PVC roofing sheets being installed"
               className="absolute inset-0 w-full h-full object-cover"
               onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}

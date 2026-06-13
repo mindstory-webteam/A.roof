@@ -109,11 +109,16 @@ const ScrollReveal: React.FC<ScrollRevealProps> = ({
 };
 
 // ─────────────────────────────────────────────
-// Content data — based on the provided "Why Us" reference
+// Content data — based on the provided "Why Us" reference.
+// Each heading is split into `headingMain` (navy) and
+// `headingAccent` (coloured with the item's own accent),
+// matching the "A-Roof (ASA Coating)" two-tone heading style.
 // ─────────────────────────────────────────────
 interface WhyUsItem {
   id: number;
-  heading?: string;
+  eyebrow: string;
+  headingMain: string;
+  headingAccent: string;
   body: string[];
   videoSrc: string;
   poster: string;
@@ -123,6 +128,9 @@ interface WhyUsItem {
 const WHY_US_ITEMS: WhyUsItem[] = [
   {
     id: 1,
+    eyebrow: "FIRE SAFETY STANDARD",
+    headingMain: "Engineered for ",
+    headingAccent: "Fire Safety",
     body: [
       "A-roof brings to you an upgrade to your roofing needs. It has been designed and manufactured overcoming all the negatives, and provides a better alternative to your traditional roofings. A-roof is the solution of the future.",
       "According to the UL94-2013 standard test insulated roof panels are proven to have a flame rating that is not less than V0. Which means, our PVC/ASA roofing sheets are non-flammable and the material performs efficiently in a fire on the exterior of the property.",
@@ -133,7 +141,9 @@ const WHY_US_ITEMS: WhyUsItem[] = [
   },
   {
     id: 2,
-    heading: "SUPERIOR CORROSION RESISTANCE",
+    eyebrow: "WEATHER & CHEMICAL RESISTANCE",
+    headingMain: "Superior Corrosion ",
+    headingAccent: "Resistance",
     body: [
       "Our range of roofing sheets has an excellent corrosion resistance, showing no chemical reactions when immersed in an acid solution of concentration below 70% saline solution or alkali solution for 24 hours. These roofing sheets are ideal for coastal areas as well as areas with frequent exposure to high humidity.",
     ],
@@ -143,7 +153,9 @@ const WHY_US_ITEMS: WhyUsItem[] = [
   },
   {
     id: 3,
-    heading: "REMARKABLE HEAT INSULATION",
+    eyebrow: "THERMAL PERFORMANCE",
+    headingMain: "Remarkable Heat ",
+    headingAccent: "Insulation",
     body: [
       "Our plastic roofing materials have remarkable heat insulation ability/performance. The heat conductivity efficiency is 0.07W/(m.K) which is 1/6 times more coefficient than cement roofing sheet and only 1/2200 times more coefficient than that of 0.5mm thick colour steel sheets.",
     ],
@@ -153,7 +165,9 @@ const WHY_US_ITEMS: WhyUsItem[] = [
   },
   {
     id: 4,
-    heading: "GOOD SOUND INSULATION",
+    eyebrow: "ACOUSTIC COMFORT",
+    headingMain: "Good Sound ",
+    headingAccent: "Insulation",
     body: [
       "The test shows that the roofing sheets boast good noise-absorbing effect under the noise of rainstorm and strong wind. It is 30dB lower than steel roofs.",
     ],
@@ -163,7 +177,9 @@ const WHY_US_ITEMS: WhyUsItem[] = [
   },
   {
     id: 5,
-    heading: "LONG-LASTING COLOUR STABILITY",
+    eyebrow: "UV & COLOUR PROTECTION",
+    headingMain: "Long-Lasting Colour ",
+    headingAccent: "Stability",
     body: [
       "Our PVC/ASA roofing sheets have an outstanding anti-UV performance with at least 10 years of colour stability (\u0394E\u22645) when exposed to varying temperatures and any other severe environmental conditions for outdoor use in areas with strong sun radiation.",
     ],
@@ -173,17 +189,21 @@ const WHY_US_ITEMS: WhyUsItem[] = [
   },
   {
     id: 6,
-    heading: "HIGH LOADING AND BEARING CAPACITY",
+    eyebrow: "STRUCTURAL STRENGTH",
+    headingMain: "High Loading & Bearing ",
+    headingAccent: "Capacity",
     body: [
       "Our products have very high loading capacity. The roof sheet (3mm thick) can be bearing 120kg when the purlin spacing is less than 700mm.",
     ],
     videoSrc: "/prodect/Tile-roof.mp4",
     poster: "/frames/why-us/loading-capacity.jpg",
-    accent: "#0d1117",
+    accent: "#dc2626",
   },
   {
     id: 7,
-    heading: "EFFICIENT AND CONVENIENT INSTALLATION",
+    eyebrow: "INSTALLATION EFFICIENCY",
+    headingMain: "Efficient & Convenient ",
+    headingAccent: "Installation",
     body: [
       "Our weatherproof ASA-PVC roofing sheet weighs lesser than clay sheets. They offer an effective width of up to 1050mm, ensuring high installation efficiency. (They also cost lesser than clay sheets without affecting your budget roofing construction.)",
     ],
@@ -268,12 +288,12 @@ function WhyUsRow({ item, index }: { item: WhyUsItem; index: number }) {
           transition: "opacity 0.8s ease 0.18s, transform 0.9s cubic-bezier(0.22,1,0.36,1) 0.18s",
         }}
       >
-        {item.heading && (
-          <>
-            <h3 className="wu-heading">{item.heading}</h3>
-            <div className="wu-divider" style={{ background: item.accent }} />
-          </>
-        )}
+        <span className="wu-eyebrow">{item.eyebrow}</span>
+
+        <h3 className="wu-heading">
+          {item.headingMain}
+          <span style={{ color: item.accent }}>{item.headingAccent}</span>
+        </h3>
 
         {item.body.map((para, i) => (
           <ScrollReveal
@@ -326,55 +346,50 @@ export default function WhyUsSection() {
           overflow: hidden;
         }
 
+        /* ── Eyebrow pill — shared by hero and each row ── */
+        .wu-eyebrow {
+          display: inline-block;
+          background: #e8f0fb;
+          color: #002c5b;
+          font-size: 11px;
+          font-weight: 800;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          padding: 7px 18px;
+          border-radius: 6px;
+          margin-bottom: 18px;
+        }
+
         /* ── Hero ── */
         .wu-hero {
-          position: relative;
           width: 100%;
-          aspect-ratio: 16 / 5;
-          min-height: 280px;
-          overflow: hidden;
-          
+          background: #ffffff;
+          padding: clamp(56px, 9vh, 110px) clamp(20px, 7vw, 96px) clamp(40px, 6vh, 72px);
         }
-        .wu-hero-video,
-        .wu-hero-poster {
-          position: absolute;
-          inset: 0;
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-        }
-        .wu-hero-overlay {
-          position: absolute;
-          inset: 0;
-          
-        }
-        .wu-hero-content {
-          position: absolute;
-          left: clamp(20px, 7vw, 96px);
-          bottom: clamp(28px, 6vh, 56px);
-          right: clamp(20px, 7vw, 96px);
-          max-width: 640px;
+        .wu-hero-inner {
+          max-width: 760px;
           opacity: 0;
           transform: translateY(24px);
           transition: opacity 0.8s ease 0.1s, transform 0.9s cubic-bezier(0.22,1,0.36,1) 0.1s;
         }
-        .wu-hero-content.wu-visible {
+        .wu-hero-inner.wu-visible {
           opacity: 1;
           transform: translateY(0);
         }
-        .wu-hero-title {
-          font-size: clamp(28px, 4vw, 44px);
+        .wu-hero-heading {
+          font-size: clamp(32px, 5vw, 56px);
           font-weight: 900;
-          letter-spacing: 0.06em;
-          text-transform: uppercase;
-          color: #ffffff;
-          margin: 0 0 10px;
+          letter-spacing: -0.02em;
+          line-height: 1.12;
+          color: #002c5b;
+          margin: 0 0 16px;
         }
         .wu-hero-text {
-          font-size: clamp(13px, 1.1vw, 15px);
+          font-size: clamp(14px, 1.1vw, 16px);
           font-weight: 400;
-          line-height: 1.8;
-          color: rgba(255,255,255,0.86);
+          line-height: 1.85;
+          color: #4a5568;
+          max-width: 640px;
           margin: 0;
         }
 
@@ -429,18 +444,12 @@ export default function WhyUsSection() {
 
         /* ── Content text ── */
         .wu-heading {
-          font-size: clamp(18px, 2vw, 24px);
-          font-weight: 800;
-          letter-spacing: 0.01em;
-          text-transform: uppercase;
-          color: #0d1b2e;
-          margin: 0 0 12px;
-        }
-        .wu-divider {
-          width: 32px;
-          height: 3px;
-          border-radius: 2px;
-          margin-bottom: 18px;
+          font-size: clamp(24px, 3vw, 38px);
+          font-weight: 900;
+          letter-spacing: -0.02em;
+          line-height: 1.16;
+          color: #002c5b;
+          margin: 0 0 14px;
         }
         .wu-body {
           font-size: clamp(13px, 1vw, 15px);
@@ -454,25 +463,19 @@ export default function WhyUsSection() {
           .wu-row { text-align: center; }
           .wu-video-col { flex-basis: 100%; justify-content: center; }
           .wu-content-col { flex-basis: 100%; }
-          .wu-divider { margin-left: auto; margin-right: auto; }
+          .wu-hero { text-align: center; }
+          .wu-hero-text { margin-left: auto; margin-right: auto; }
         }
       `}</style>
 
       <section className="wu-root">
         {/* ── Hero ── */}
-        <div className="wu-hero" ref={heroRef}>
-          {/* <video
-            className="wu-hero-video"
-            src="/videos/roof.mp4"
-            poster="/frames/why-us/hero-roof.jpg"
-            autoPlay
-            muted
-            loop
-            playsInline
-          /> */}
-          <div className="wu-hero-overlay" />
-          <div className={`wu-hero-content${heroVisible ? " wu-visible" : ""}`}>
-            <h1 className="wu-hero-title">Why Us</h1>
+        <div className="wu-hero">
+          <div ref={heroRef} className={`wu-hero-inner${heroVisible ? " wu-visible" : ""}`}>
+            <span className="wu-eyebrow">Welcome to</span>
+            <h1 className="wu-hero-heading">
+              Why Choose <span style={{ color: "#e8700a" }}>A-Roof?</span>
+            </h1>
             <ScrollReveal
               baseOpacity={0.08}
               baseRotation={2}

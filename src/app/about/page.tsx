@@ -19,7 +19,7 @@ const NAV_ITEMS = [
         label: 'Who We Are',
         href: '/about',
         ariaLabel: 'Learn who we are',
-        gif: 'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif',
+        video: '/videos/brcm.mp4',
       },
       {
         label: 'Why Us',
